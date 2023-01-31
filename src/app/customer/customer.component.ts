@@ -19,7 +19,7 @@ function ratingRange(minValue: number, maxValue: number) : ValidatorFn {
     };
 }
 
-function emailMatcher(c: AbstractControl) : { [key: string] : boolean} | null{
+function emailMatcher(c: AbstractControl) : ValidationError | null{
   const emailControl = c.get('email');
   const confirmControl = c.get('confirmEmail');
   if(emailControl?.pristine || confirmControl?.pristine) {
@@ -28,7 +28,15 @@ function emailMatcher(c: AbstractControl) : { [key: string] : boolean} | null{
   if( emailControl?.value === confirmControl ?.value){
     return null;
   }
-  return { 'match' : true };
+  return ({ 'match' : true });
+}
+
+type ValidationError = {
+  [key: string] : boolean;
+}
+
+type ValidationMessage = {
+  [key: string] : string;
 }
 
 @Component({
@@ -44,7 +52,7 @@ export class CustomerComponent implements OnInit{
 
   emailMessage: string='';
 
-  private validationMessages = {
+  private validationMessages : ValidationMessage = {
     required: 'Please enter your email address.',
     email: 'Please enter a valid email address.',
   };
@@ -139,8 +147,8 @@ export class CustomerComponent implements OnInit{
     this.emailMessage='';
     if((c.touched || c.dirty) && c.errors){
       this.emailMessage = Object.keys(c.errors).map(
-        (key : string ) => this.validationMessages[key as keyof typeof this.validationMessages]
-        // (key : string ) => this.validationMessages[key]
+        // (key : string ) => this.validationMessages[key as keyof typeof this.validationMessages]
+        (key : string ) => this.validationMessages[key]
       ).join(' ');
     }
   }
